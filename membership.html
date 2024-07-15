@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="icon" type="image/x-icon" href="d.avif">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .pay-button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .pay-button:hover {
+        background-color: #0056b3;
+      }
+
+      #status {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Payment Gateway</h1>
+      <button class="pay-button">Pay Now</button>
+      <div id="status"></div>
+    </div>
+    <script type="text/javascript">
+      window.addEventListener("load", async () => {
+        if (window.ethereum) {
+          window.web3 = new Web3(ethereum);
+          try {
+            await ethereum.enable();
+            initPayButton();
+          } catch (err) {
+            $("#status").html("User denied account access", err);
+          }
+        } else if (window.web3) {
+          window.web3 = new Web3(web3.currentProvider);
+          initPayButton();
+        } else {
+          $("#status").html("No Metamask (or other Web3 Provider) installed");
+        }
+      });
+
+      const initPayButton = () => {
+        $(".pay-button").click(() => {
+          // paymentAddress is where funds will be sent to
+          const paymentAddress = "0x51EC0b3A0B7e5350A9A41Af34627cc74e93803Fc";
+          const amountEth = 0.000000000000000001;
+
+          web3.eth.sendTransaction(
+            {
+              to: paymentAddress,
+              value: web3.toWei(amountEth, "ether"),
+            },
+            (err, transactionId) => {
+              if (err) {
+                console.log("Payment failed", err);
+                $("#status").html("Payment failed");
+              } else {
+                console.log("Payment successful", transactionId);
+                $("#status").html("Payment successful");
+              }
+            }
+          );
+        });
+      };
+    </script>
+  </body>
+</html>
